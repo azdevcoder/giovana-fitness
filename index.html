@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sistema Web Fitness - Giovana Morais</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #ffe7f0; /* rosado claro */
+    color: #4a2c3a; /* rosa escuro */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  header {
+    background: linear-gradient(90deg, #d16ba5, #fbcde0);
+    color: #fff;
+    padding: 1.8rem 2rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: 1.2px;
+    user-select: none;
+    box-shadow: 0 4px 12px #d16ba5cc;
+  }
+  main {
+    flex-grow: 1;
+    max-width: 940px;
+    margin: 2rem auto 3rem;
+    padding: 0 1rem;
+  }
+  section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 22px rgba(209,107,165,0.3);
+    padding: 1.8rem 2.2rem;
+    margin-bottom: 2.5rem;
+  }
+  h2 {
+    color: #a33a72;
+    margin-bottom: 1.3rem;
+    text-align: center;
+    user-select: none;
+  }
+
+  /* IMC e registro */
+  #imc-section form {
+    max-width: 360px;
+    margin: 0 auto 1.2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    user-select: none;
+  }
+  #imc-section label {
+    flex-basis: 100%;
+    font-weight: 600;
+    color: #8f4a70;
+    font-size: 1rem;
+  }
+  #imc-section input[type=number] {
+    padding: 0.45rem 0.7rem;
+    border-radius: 8px;
+    border: 2px solid #d577a0;
+    color: #702b59;
+    font-weight: 600;
+    font-size: 1rem;
+    width: 160px;
+    box-shadow: inset 1px 1px 6px #f6a4d4cc;
+    outline-offset: 1px;
+  }
+  #imc-section button {
+    background: #d965a5;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(217,101,165,0.85);
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+  #imc-section button:hover {
+    background: #bf4d8d;
+  }
+  #imc-current {
+    max-width: 360px;
+    margin: 0 auto 1.5rem;
+    background: #f7cde6;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #7a2451;
+    text-align: center;
+    user-select: none;
+    box-shadow: inset 0 0 8px #b03b78cc;
+  }
+  #imc-chart {
+    max-width: 720px;
+    margin: 0 auto;
+    user-select: none;
+  }
+  /* Botões do cronômetro com a mesma cor dos outros botões */
+  #start-btn, #pause-btn, #reset-btn {
+    background: #d965a5;
+    border: none;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(217,101,165,0.85);
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+
+  #start-tracking-btn, #stop-tracking-btn {
+    background: #d965a5;
+    border: none;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(217,101,165,0.85);
+    user-select: none;
+    transition: background-color 0.3s ease;    
+  }
+
+  #start-btn:hover:not(:disabled),
+  #pause-btn:hover:not(:disabled),
+  #reset-btn:hover:not(:disabled) {
+    background: #bf4d8d;
+  }
+  /* Cronômetro e distância */
+  .exercise-controller {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 2rem;
+  }
+  .timer, .distance-meter {
+    flex: 1 1 320px;
+    background: #fad5e5;
+    border-radius: 12px;
+    padding: 1.2rem 2rem 2rem 2rem;
+    text-align: center;
+  }
+  .timer-display, .distance-display {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin: 1rem 0 1.6rem;
+    user-select: none;
+    color: #7a2b57;
+    text-shadow: 0 1px 2px #e2aed2dd;
+  }
+
+  button:disabled {
+    background-color: #e6adc6;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Dicas de exercícios */
+  .objective-selector {
+    max-width: 320px;
+    margin: 0 auto 1.3rem;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.55rem;
+    border-radius: 8px;
+    border: 1.8px solid #eeb0d5;
+    background: #ffe7f0;
+    cursor: pointer;
+    user-select: none;
+    color: #7a2b57;
+  }
+  .exercise-destination {
+    max-width: 740px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: #631f46;
+    background: #fad6e2;
+    padding: 1rem 1.6rem;
+    border-radius: 12px;
+    box-shadow: inset 0 0 9px #cb84a6;
+    min-height: 100px;
+    user-select: none;
+  }
+  footer {
+    text-align: center;
+    padding: 1.4rem 0;
+    font-size: 0.95rem;
+    color: #a16a8c;
+    border-top: 1px solid #e1a4c1;
+    user-select: none;
+  }
+  @media(max-width: 720px) {
+    .exercise-controller {
+      flex-direction: column;
+      align-items: center;
+    }
+    #imc-chart {
+      max-width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  Giovana Fitness - Sistema Web
+</header>
+<main>
+  <section id="imc-section">
+    <h2>Acompanhamento do IMC</h2>
+    <form id="imc-form" aria-label="Formulário para adicionar peso e altura">
+      <label for="peso-input">Peso (kg):</label>
+      <input type="number" id="peso-input" min="30" max="300" step="0.1" placeholder="Ex: 68.5" required aria-required="true" />
+      <label for="altura-input">Altura (cm):</label>
+      <input type="number" id="altura-input" min="100" max="250" step="0.5" placeholder="Ex: 172" required aria-required="true" />
+      <br> <button type="submit" aria-label="Salvar dados">Salvar</button>
+    </form>
+    <div id="imc-current" aria-live="polite" aria-atomic="true" role="region">
+      IMC Atual: <em>Dados não registrados</em>
+    </div>
+    <canvas id="imc-chart" width="700" height="250" aria-label="Gráfico da evolução do IMC"></canvas>
+  </section>
+
+  <section id="exercise-control">
+    <h2>Controlador de Exercícios</h2>
+    <div class="exercise-controller">
+      <div class="timer" aria-label="Cronômetro">
+        <h3>Cronômetro</h3>
+        <div id="timer-display" class="timer-display" aria-live="off" aria-atomic="true" role="timer">00:00:00</div>
+        <div>
+          <button id="start-btn">Iniciar</button>
+          <button id="pause-btn" disabled>Pause</button>
+          <button id="reset-btn" disabled>Resetar</button>
+        </div>
+      </div>
+      <div class="distance-meter" aria-label="Medidor automático de distância percorrida">
+        <h3>Medidor de Distância (km)</h3>
+        <div id="distance-display" class="distance-display" aria-live="polite" aria-atomic="true">Distância: 0.00 km</div>
+        <div>
+          <p><button id="start-tracking-btn">Iniciar rastreamento</button></p>
+          <p><button id="stop-tracking-btn" disabled>Parar rastreamento</button></p>
+        </div>
+        <p id="gps-status" style="margin-top:8px; font-weight:700; color:#b35a7b;"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="exercise-tips">
+    <h2>Dicas de Exercícios por Objetivo</h2>
+    <select id="objective-select" class="objective-selector" aria-label="Selecionar objetivo">
+      <option value="" disabled selected>Selecione seu objetivo</option>
+      <option value="perda_peso">Perda de Peso</option>
+      <option value="ganho_muscular">Ganho Muscular</option>
+      <option value="melhora_resistencia">Melhora da Resistência</option>
+      <option value="flexibilidade">Flexibilidade</option>
+      <option value="bem_estar">Bem-estar Geral</option>
+    </select>
+    <div id="exercise-advice" class="exercise-destination" role="region" aria-live="polite" aria-atomic="true">
+      <em>Escolha um objetivo para ver as dicas.</em>
+    </div>
+  </section>
+</main>
+<footer>  
+  &copy; 2025 Sistema Web Giovana Fitness. Mantenha-se saudável!
+  <p>Todos os direiros reservados AzDev Coder</p>
+</footer>
+
+<script>
+(() => {
+  // Dados de IMC armazenados no localStorage como array [{date, peso, altura, imc}]
+  let imcData = JSON.parse(localStorage.getItem('imcData')) || [];
+
+  // Distância acumulada salva para persistir dados de distância
+  let totalDistanceMeters = parseFloat(localStorage.getItem('totalDistanceMeters')) || 0;
+
+  // Função para calcular IMC
+  function calcIMC(peso, alturaCm){
+    const alturaM = alturaCm / 100;
+    return peso / (alturaM*alturaM);
+  }
+
+  // IMC - Interface e gráfico
+  const imcForm = document.getElementById('imc-form');
+  const pesoInput = document.getElementById('peso-input');
+  const alturaInput = document.getElementById('altura-input');
+  const imcCurrent = document.getElementById('imc-current');
+  const imcChart = document.getElementById('imc-chart');
+  const ctx = imcChart.getContext('2d');
+
+  // Função para renderizar gráfico simples do IMC ao longo do tempo usando Canvas
+  function drawImcChart(){
+    ctx.clearRect(0,0, imcChart.width, imcChart.height);
+    if(imcData.length < 2) {
+      // texto instrução
+      ctx.fillStyle = '#a85f91';
+      ctx.font = '18px Poppins, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Insira ao menos dois registros para visualizar evolução.', imcChart.width/2, imcChart.height/2);
+      return;
+    }
+
+    // Margin e escalas
+    const margin = 50;
+    const width = imcChart.width - margin *2;
+    const height = imcChart.height - margin *2;
+
+    // Extração dos valores IMC para eixo Y e datas para eixo X
+    const imcValues = imcData.map(d => d.imc);
+    const dates = imcData.map(d => new Date(d.date));
+
+    // Eixo Y - limites
+    const minImc = Math.min(...imcValues) * 0.9;
+    const maxImc = Math.max(...imcValues) * 1.1;
+
+    // Eixo X - intervalo de datas
+    const minDate = Math.min(...dates);
+    const maxDate = Math.max(...dates);
+    const dateSpan = maxDate - minDate;
+
+    // Funções para converter dados em coords canvas
+    function xScale(date){
+      return margin + ((date - minDate) / dateSpan) * width;
+    }
+    function yScale(imc){
+      return margin + height - ((imc - minImc) / (maxImc - minImc)) * height;
+    }
+
+    // Desenhar grid Y (IMC)
+    ctx.strokeStyle = '#f19fc0cc';
+    ctx.fillStyle = '#e973a5cc';
+    ctx.lineWidth = 1;
+    ctx.textAlign = 'right';
+    ctx.font = '12px Poppins, sans-serif';
+
+    const ySteps = 5;
+    for(let i = 0; i <= ySteps; i++){
+      const yVal = minImc + ((maxImc - minImc) / ySteps)*i;
+      const yPos = yScale(yVal);
+      ctx.beginPath();
+      ctx.moveTo(margin - 5, yPos);
+      ctx.lineTo(imcChart.width - margin + 5, yPos);
+      ctx.stroke();
+      ctx.fillText(yVal.toFixed(1), margin - 10, yPos + 4);
+    }
+
+    // Desenhar eixo X (datas)
+    ctx.textAlign = 'center';
+    ctx.font = '11px Poppins, sans-serif';
+    for(let i=0; i < dates.length; i++){
+      const x = xScale(dates[i]);
+      ctx.fillStyle = '#a74d77';
+      const d = dates[i];
+      const label = `${d.getDate()}/${d.getMonth()+1}`;
+      ctx.fillText(label, x, imcChart.height - margin + 20);
+    }
+
+    // Curva IMC
+    ctx.strokeStyle = '#b1306d';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    for(let i=0; i < imcData.length; i++){
+      const x = xScale(dates[i]);
+      const y = yScale(imcValues[i]);
+      if(i === 0){
+        ctx.moveTo(x,y);
+      } else {
+        ctx.lineTo(x,y);
+      }
+    }
+    ctx.stroke();
+
+    // Pontos nos dados
+    ctx.fillStyle = '#d14b82';
+    for(let i=0; i < imcData.length; i++){
+      const x = xScale(dates[i]);
+      const y = yScale(imcValues[i]);
+      ctx.beginPath();
+      ctx.arc(x,y,6,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  // Exibir IMC atual mais recente
+  function updateCurrentImcDisplay(){
+    if(imcData.length === 0){
+      imcCurrent.innerHTML = 'IMC Atual: <em>Dados não registrados</em>';
+      return;
+    }
+    const lastRecord = imcData[imcData.length-1];
+    imcCurrent.innerHTML = `
+      IMC Atual: <strong>${lastRecord.imc.toFixed(1)}</strong> (em ${new Date(lastRecord.date).toLocaleDateString()})
+    `;
+  }
+
+  // Evento submit do form IMC
+  imcForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const peso = parseFloat(pesoInput.value);
+    const altura = parseFloat(alturaInput.value);
+    if(isNaN(peso) || isNaN(altura)) {
+      alert('Por favor, insira valores válidos de peso e altura.');
+      return;
+    }
+    const imc = calcIMC(peso, altura);
+    imcData.push({date: (new Date()).toISOString(), peso, altura, imc});
+    localStorage.setItem('imcData', JSON.stringify(imcData));
+    updateCurrentImcDisplay();
+    drawImcChart();
+    pesoInput.value = '';
+    alturaInput.value = '';
+  });
+
+  /*
+   MEDIDOR DE DISTÂNCIA COM GPS
+  */
+  const distanceDisplay = document.getElementById('distance-display');
+  const startTrackingBtn = document.getElementById('start-tracking-btn');
+  const stopTrackingBtn = document.getElementById('stop-tracking-btn');
+  const gpsStatus = document.getElementById('gps-status');
+
+  let watchId = null;
+  let coordsHistory = [];
+
+  // Carrega distância total armazenada e atualiza display
+  function loadDistanceData(){
+    totalDistanceMeters = parseFloat(localStorage.getItem('totalDistanceMeters')) || 0;
+    updateDistanceDisplay();
+  }
+
+  function toRadians(deg) {
+    return deg * Math.PI / 180;
+  }
+  // Função para calcular distância entre 2 pontos GPS (Haversine)
+  function haversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371000; // raio da Terra em metros
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  function updateDistanceDisplay() {
+    distanceDisplay.textContent = `Distância: ${(totalDistanceMeters / 1000).toFixed(2)} km`;
+  }
+
+  function successPosition(pos) {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    gpsStatus.textContent = `Rastreamento ativo...`;
+    if (coordsHistory.length > 0) {
+      const prev = coordsHistory[coordsHistory.length - 1];
+      const dist = haversineDistance(prev.lat, prev.lon, lat, lon);
+      // Desconsiderar pequenos saltos (< 2 metros)
+      if (dist > 2) {
+        totalDistanceMeters += dist;
+        localStorage.setItem('totalDistanceMeters', totalDistanceMeters.toString());
+        updateDistanceDisplay();
+      }
+    }
+    coordsHistory.push({lat, lon});
+  }
+
+  function errorPosition(err) {
+    gpsStatus.textContent = `Erro de GPS: ${err.message}`;
+  }
+
+  function startTracking() {
+    if (!('geolocation' in navigator)) {
+      alert('Geolocalização não suportada por este navegador.');
+      return;
+    }
+    totalDistanceMeters = parseFloat(localStorage.getItem('totalDistanceMeters')) || 0;
+    coordsHistory = [];
+    updateDistanceDisplay();
+    gpsStatus.textContent = 'Solicitando acesso ao GPS...';
+    watchId = navigator.geolocation.watchPosition(successPosition, errorPosition, {
+      enableHighAccuracy: true,
+      maximumAge: 1000,
+      timeout: 10000
+    });
+    startTrackingBtn.disabled = true;
+    stopTrackingBtn.disabled = false;
+  }
+
+  function stopTracking() {
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+      gpsStatus.textContent = 'Rastreamento parado.';
+    }
+    startTrackingBtn.disabled = false;
+    stopTrackingBtn.disabled = true;
+  }
+
+  startTrackingBtn.addEventListener('click', startTracking);
+  stopTrackingBtn.addEventListener('click', stopTracking);
+
+  /*
+    Dicas de exercícios por objetivo
+  */
+  const objectiveSelect = document.getElementById('objective-select');
+  const exerciseAdvice = document.getElementById('exercise-advice');
+
+  const exerciseTipsBasic = {
+    'perda_peso': `
+      <ul>
+        <li>Exercícios aeróbicos: caminhada, corrida leve e bicicleta.</li>
+        <li>Treinamento de força duas vezes por semana.</li>
+        <li>Mantenha alimentação hipocalórica balanceada.</li>
+        <li>Durma 7-8 horas por noite para melhor recuperação.</li>
+      </ul>`,
+    'ganho_muscular': `
+      <ul>
+        <li>Musculação com foco em séries progressivas.</li>
+        <li>Alta ingestão de proteínas.</li>
+        <li>Alimente-se com calorias suficientes para crescimento.</li>
+        <li>Descanso adequado entre treinos.</li>
+      </ul>`,
+    'melhora_resistencia': `
+      <ul>
+        <li>Exercícios aeróbicos consistentes, acompanhe a progressão.</li>
+        <li>Treinamento intervalado para melhorar capacidade cardiovascular.</li>
+        <li>Hidratação constante.</li>
+        <li>Alongamento antes e após a atividade.</li>
+      </ul>`,
+    'flexibilidade': `
+      <ul>
+        <li>Alongamentos diários e exercícios de mobilidade.</li>
+        <li>Yoga ou pilates para ganho de flexibilidade.</li>
+        <li>Respiração controlada para relaxamento.</li>
+        <li>Evite períodos prolongados em poses fixas.</li>
+      </ul>`,
+    'bem_estar': `
+      <ul>
+        <li>Atividades agradáveis como caminhada e meditação.</li>
+        <li>Cuidado com a alimentação equilibrada.</li>
+        <li>Manutenção do sono saudável.</li>
+        <li>Reduza o estresse com hobbies e lazer.</li>
+      </ul>`
+  };
+
+  const exerciseTipsAdvanced = {
+    'perda_peso': `
+      <ul>
+        <li>Pratique HIIT para maximizar o gasto calórico.</li>
+        <li>Combine exercícios de força para preservar massa magra.</li>
+        <li>Planeje refeição com controle de macros.</li>
+        <li>Monitore periodicamente progresso com avaliações físicas.</li>
+      </ul>`,
+    'ganho_muscular': `
+      <ul>
+        <li>Treinos avançados de hipertrofia com técnicas variadas.</li>
+        <li>Ingestão calórica acima do gasto para ganho muscular.</li>
+        <li>Suplementação conforme necessidade individual.</li>
+        <li>Planejamento detalhado de descanso e treino.</li>
+      </ul>`,
+    'melhora_resistencia': `
+      <ul>
+        <li>Treinos longos de endurance com variação de intensidade.</li>
+        <li>Programas avançados de interval training.</li>
+        <li>Ajuste nutricional para performance máxima.</li>
+        <li>Técnicas de recuperação acelerada.</li>
+      </ul>`,
+    'flexibilidade': `
+      <ul>
+        <li>Yoga avançado e exercícios funcionais específicos.</li>
+        <li>Treinos com foco em amplitude articular ótima.</li>
+        <li>Massagens e técnicas de relaxamento muscular.</li>
+        <li>Integração de respiração e movimento consciente.</li>
+      </ul>`,
+    'bem_estar': `
+      <ul>
+        <li>Programas de atividades físicas integrativas.</li>
+        <li>Nutrientes focados em saúde mental e física.</li>
+        <li>Práticas regulares de mindfulness.</li>
+        <li>Gerenciamento avançado do estresse.</li>
+      </ul>`
+  };
+
+  function isImcImproving() {
+    if(imcData.length < 2) return false;
+    const lastImcs = imcData.slice(-3).map(d => d.imc);
+    const avgImc = lastImcs.reduce((a,b) => a+b,0)/lastImcs.length;
+    const last = lastImcs[lastImcs.length -1];
+    const distLast = Math.min(Math.abs(last - 18.5), Math.abs(last - 24.9));
+    const distAvg = Math.min(Math.abs(avgImc - 18.5), Math.abs(avgImc - 24.9));
+    return distAvg < distLast;
+  }
+
+  function updateExerciseTips(){
+    const selected = objectiveSelect.value;
+    if(!selected){
+      exerciseAdvice.innerHTML = '<em>Escolha um objetivo para ver as dicas.</em>';
+      return;
+    }
+    const imcProgress = isImcImproving() ? 'advanced' : 'basic';
+    if(imcProgress === 'advanced'){
+      exerciseAdvice.innerHTML = exerciseTipsAdvanced[selected] || '<em>Sem dicas disponíveis para este objetivo.</em>';
+    } else {
+      exerciseAdvice.innerHTML = exerciseTipsBasic[selected] || '<em>Sem dicas disponíveis para este objetivo.</em>';
+    }
+  }
+
+  objectiveSelect.addEventListener('change', updateExerciseTips);
+
+  // Cronômetro
+  let timerInterval;
+  let elapsedSeconds = 0;
+  let running = false;
+
+  const timerDisplay = document.getElementById('timer-display');
+  const startBtn = document.getElementById('start-btn');
+  const pauseBtn = document.getElementById('pause-btn');
+  const resetBtn = document.getElementById('reset-btn');
+
+  function updateTimerDisplay() {
+    const hrs = Math.floor(elapsedSeconds / 3600).toString().padStart(2, '0');
+    const mins = Math.floor((elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
+    const secs = (elapsedSeconds % 60).toString().padStart(2, '0');
+    timerDisplay.textContent = `${hrs}:${mins}:${secs}`;
+  }
+
+  function startTimer() {
+    if (running) return;
+    running = true;
+    startBtn.disabled = true;
+    pauseBtn.disabled = false;
+    resetBtn.disabled = false;
+    timerInterval = setInterval(() => {
+      elapsedSeconds++;
+      updateTimerDisplay();
+    }, 1000);
+  }
+
+  function pauseTimer() {
+    running = false;
+    clearInterval(timerInterval);
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+  }
+
+  function resetTimer() {
+    running = false;
+    clearInterval(timerInterval);
+    elapsedSeconds = 0;
+    updateTimerDisplay();
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    resetBtn.disabled = true;
+  }
+
+  startBtn.addEventListener('click', startTimer);
+  pauseBtn.addEventListener('click', pauseTimer);
+  resetBtn.addEventListener('click', resetTimer);
+
+  // Inicializações
+  updateCurrentImcDisplay();
+  drawImcChart();
+  updateExerciseTips();
+  updateDistanceDisplay();
+  updateTimerDisplay();
+
+})();
+</script>
+</body>
+</html>
